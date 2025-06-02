@@ -626,9 +626,12 @@
                 let data = [];
                 const fileName = file.name.toLowerCase();
                 
+                console.log('Import de fichier:', fileName);
+                
                 if (fileName.endsWith('.csv')) {
                     const text = await file.text();
-                    data = parseCSV(text);
+                    console.log('Contenu brut CSV (100 premiers caractères):', text.substring(0, 100));
+                    data = parseCSVAdvanced(text);
                 } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
                     const arrayBuffer = await file.arrayBuffer();
                     const workbook = XLSX.read(arrayBuffer);
@@ -647,28 +650,181 @@
                     }
                 }
                 
+                console.log('Données parsées:', data.slice(0, 2)); // Afficher les 2 premières lignes
+                
                 importData = processImportData(data);
                 showImportPreview();
             } catch (error) {
+                console.error('Erreur import:', error);
                 alert('Erreur lors de l\'import: ' + error.message);
             }
             
             event.target.value = '';
         }
 
+        function parseCSVAdvanced(text) {
+            console.log('=== DÉBUT ANALYSE CSV ===');
+            
+            // Nettoyer le texte
+            text = text.trim();
+            const lines = text.split(/\r?\n/).filter(line => line.trim());
+            console.log('Nombre de lignes:', lines.length);
+            
+            if (lines.length <= 1) {
+                console.log('Fichier vide ou une seule ligne');
+                return [];
+            }
+            
+            const firstLine = lines[0];
+            console.log('Première ligne brute:', firstLine);
+            
+            // Détecter le séparateur
+            const separators = [',', ';', '\t', '|'];
+            let bestSeparator = ',';
+            let maxColumns = 0;
+            
+            separators.forEach(sep => {
+                // Compter en ignorant les séparateurs dans les guillemets
+                const testSplit = splitCSVLine(firstLine, sep);
+                const columns = testSplit.length;
+                console.log(`Test séparateur "${sep}": ${columns} colonnes`, testSplit);
+                
+                if (columns > maxColumns && columns >= 3) { // Au moins 3 colonnes nécessaires
+                    maxColumns = columns;
+                    bestSeparator = sep;
+                }
+            });
+            
+            console.log(`Séparateur choisi: "${bestSeparator}" (${maxColumns} colonnes)`);
+            
+            // Parser toutes les lignes
+            const headers = splitCSVLine(firstLine, bestSeparator).map(h => h.trim());
+            console.log('Headers détectés:', headers);
+            
+            const result = lines.slice(1).map((line, index) => {
+                const values = splitCSVLine(line, bestSeparator);
+                const obj = {};
+                headers.forEach((header, idx) => {
+                    obj[header] = (values[idx] || '').trim();
+                });
+                
+                if (index < 2) { // Log des 2 premières lignes
+                    console.log(`Ligne ${index + 1}:`, obj);
+                }
+                
+                return obj;
+            });
+            
+            console.log('=== FIN ANALYSE CSV ===');
+            return result;
+        }
+        
+        function splitCSVLine(line, separator) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            let i = 0;
+            
+            while (i < line.length) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        // Double quote = escaped quote
+                        current += '"';
+                        i += 2;
+                        continue;
+                    } else {
+                        // Toggle quote state
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === separator && !inQuotes) {
+                    // End of field
+                    result.push(current);
+                    current = '';
+                    i++;
+                    continue;
+                } else {
+                    current += char;
+                }
+                i++;
+            }
+            
+            // Add last field
+            result.push(current);
+            
+            // Nettoyer les guillemets en début/fin
+            return result.map(field => {
+                field = field.trim();
+                if (field.startsWith('"') && field.endsWith('"')) {
+                    field = field.slice(1, -1);
+                }
+                return field;
+            });
+        }
+
         function parseCSV(text) {
             const lines = text.split('\n').filter(line => line.trim());
             if (lines.length <= 1) return [];
             
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            // Détecter le séparateur automatiquement
+            const separators = [',', ';', '\t', '|'];
+            let bestSeparator = ',';
+            let maxColumns = 0;
+            
+            const firstLine = lines[0];
+            separators.forEach(sep => {
+                const columns = firstLine.split(sep).length;
+                if (columns > maxColumns) {
+                    maxColumns = columns;
+                    bestSeparator = sep;
+                }
+            });
+            
+            console.log(`Séparateur détecté: "${bestSeparator}" (${maxColumns} colonnes)`);
+            
+            // Parser avec le bon séparateur
+            const headers = parseCSVLine(lines[0], bestSeparator);
             return lines.slice(1).map(line => {
-                const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                const values = parseCSVLine(line, bestSeparator);
                 const obj = {};
                 headers.forEach((header, index) => {
                     obj[header] = values[index] || '';
                 });
                 return obj;
             });
+        }
+        
+        function parseCSVLine(line, separator) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        // Double quote = escaped quote
+                        current += '"';
+                        i++; // Skip next quote
+                    } else {
+                        // Toggle quote state
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === separator && !inQuotes) {
+                    // End of field
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            // Add last field
+            result.push(current.trim());
+            return result;
         }
 
         function processImportData(data) {
