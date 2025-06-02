@@ -151,9 +151,33 @@
                                class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">URL de l'image</label>
-                        <input id="productImage" type="url" placeholder="https://example.com/image.jpg"
-                               class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Image du produit</label>
+                        <div class="space-y-3">
+                            <!-- Option 1: Upload depuis ordinateur -->
+                            <div>
+                                <label class="text-sm text-gray-600">Choisir une image depuis votre ordinateur :</label>
+                                <input type="file" id="productImageFile" accept="image/*" 
+                                       class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            </div>
+                            
+                            <!-- Option 2: URL manuelle -->
+                            <div>
+                                <label class="text-sm text-gray-600">Ou coller une URL d'image :</label>
+                                <input id="productImage" type="url" placeholder="https://example.com/image.jpg"
+                                       class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <!-- Aperçu de l'image -->
+                            <div id="imagePreviewContainer" class="hidden">
+                                <label class="text-sm text-gray-600">Aperçu :</label>
+                                <div class="relative inline-block">
+                                    <img id="imagePreview" src="" alt="Aperçu" class="w-32 h-24 object-cover border rounded">
+                                    <button type="button" id="removeImage" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
+                                        ×
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -248,6 +272,11 @@
             document.getElementById('productForm').addEventListener('submit', saveProduct);
             document.getElementById('cancelImport').addEventListener('click', closeImportModal);
             document.getElementById('executeImport').addEventListener('click', executeImport);
+
+            // Gestion des images
+            document.getElementById('productImageFile').addEventListener('change', handleImageUpload);
+            document.getElementById('productImage').addEventListener('input', handleImageUrlChange);
+            document.getElementById('removeImage').addEventListener('click', clearImagePreview);
         }
 
         async function handleLogin(e) {
@@ -423,17 +452,86 @@
                 document.getElementById('productFlavors').value = product.flavors.join(', ');
                 document.getElementById('productImage').value = product.image_url || '';
                 document.getElementById('productDescription').value = product.description || '';
+                
+                // Afficher l'aperçu si une image existe
+                if (product.image_url) {
+                    showImagePreview(product.image_url);
+                }
             } else {
                 title.textContent = 'Ajouter un nouveau produit';
                 document.getElementById('productForm').reset();
                 document.getElementById('productId').value = '';
+                clearImagePreview();
             }
             
             modal.classList.remove('hidden');
         }
 
+        // Gestion de l'upload d'image depuis le disque dur
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Vérifier que c'est une image
+            if (!file.type.startsWith('image/')) {
+                alert('Veuillez sélectionner un fichier image valide (JPG, PNG, GIF)');
+                event.target.value = '';
+                return;
+            }
+
+            // Vérifier la taille (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('L\'image est trop volumineuse. Taille maximum : 5MB');
+                event.target.value = '';
+                return;
+            }
+
+            // Convertir en base64 pour affichage et stockage
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                showImagePreview(base64Image);
+                // Mettre l'image dans le champ URL pour la sauvegarde
+                document.getElementById('productImage').value = base64Image;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Gestion du changement d'URL d'image
+        function handleImageUrlChange(event) {
+            const url = event.target.value;
+            if (url && url.startsWith('http')) {
+                showImagePreview(url);
+            } else if (!url) {
+                clearImagePreview();
+            }
+        }
+
+        // Afficher l'aperçu de l'image
+        function showImagePreview(imageSrc) {
+            const container = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('imagePreview');
+            
+            preview.src = imageSrc;
+            container.classList.remove('hidden');
+        }
+
+        // Supprimer l'aperçu d'image
+        function clearImagePreview() {
+            const container = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('imagePreview');
+            const fileInput = document.getElementById('productImageFile');
+            const urlInput = document.getElementById('productImage');
+            
+            preview.src = '';
+            container.classList.add('hidden');
+            fileInput.value = '';
+            urlInput.value = '';
+        }
+
         function closeProductModal() {
             document.getElementById('productModal').classList.add('hidden');
+            clearImagePreview();
         }
 
         async function saveProduct(e) {
