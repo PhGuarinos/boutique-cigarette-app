@@ -46,7 +46,7 @@
                 </button>
             </form>
             <div class="mt-4 text-sm text-gray-600 text-center">
-                <p><strong>Comptes de démonstration :</strong></p>
+                <p><strong>Comptes de demonstration :</strong></p>
                 <p>Admin : admin / password123</p>
                 <p>Vendeur : vendeur / password123</p>
             </div>
@@ -61,9 +61,9 @@
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl font-bold text-gray-800">Gestion Boutique E-Cigarettes</h1>
                     <div class="flex items-center gap-4">
-                        <span class="text-sm text-gray-600">Connecté en tant que: <strong id="currentUser"></strong></span>
+                        <span class="text-sm text-gray-600">Connecte en tant que: <strong id="currentUser"></strong></span>
                         <button id="logoutBtn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                            Déconnexion
+                            Deconnexion
                         </button>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
 
             <!-- Message si aucun produit -->
             <div id="noProducts" class="hidden text-center py-12">
-                <p class="text-gray-500 text-lg">Aucun produit trouvé</p>
+                <p class="text-gray-500 text-lg">Aucun produit trouve</p>
             </div>
         </div>
     </div>
@@ -146,7 +146,7 @@
                                class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Saveurs * (séparées par des virgules)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Saveurs * (separees par des virgules)</label>
                         <input id="productFlavors" type="text" required placeholder="fraise, menthe, citron"
                                class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
                     </div>
@@ -169,9 +169,9 @@
                             
                             <!-- Aperçu de l'image -->
                             <div id="imagePreviewContainer" class="hidden">
-                                <label class="text-sm text-gray-600">Aperçu :</label>
+                                <label class="text-sm text-gray-600">Apercu :</label>
                                 <div class="relative inline-block">
-                                    <img id="imagePreview" src="" alt="Aperçu" class="w-32 h-24 object-cover border rounded">
+                                    <img id="imagePreview" src="" alt="Apercu" class="w-32 h-24 object-cover border rounded">
                                     <button type="button" id="removeImage" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
                                         ×
                                     </button>
@@ -201,7 +201,7 @@
     <div id="importModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b">
-                <h3 class="text-lg font-bold">📊 Prévisualisation de l'import</h3>
+                <h3 class="text-lg font-bold">Previsualisation de l'import</h3>
             </div>
             <div class="flex-1 overflow-y-auto p-6">
                 <div id="importContent">
@@ -223,11 +223,9 @@
 
     <!-- Configuration Supabase -->
     <script>
-        // ✅ CONFIGURATION CONFIGURÉE : Vos vraies valeurs Supabase
+        // Configuration avec vos vraies valeurs Supabase
         const SUPABASE_URL = 'https://vrsnzdukawusuhsguede.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyc256ZHVrYXd1c3Voc2d1ZWRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NTExMjQsImV4cCI6MjA2NDQyNzEyNH0.UpA9FR0N5ssj3Br_3M773Cdt0ptRBgCbV_SC8yd6FB4';
-
-        // ✅ Configuration OK - Application prête à fonctionner !
 
         // Initialisation de Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -434,7 +432,7 @@
             const results = document.getElementById('searchResults');
             
             if (searchTerm) {
-                results.textContent = `${filteredProducts.length} produit(s) trouvé(s) pour "${searchTerm}"`;
+                results.textContent = `${filteredProducts.length} produit(s) trouve(s) pour "${searchTerm}"`;
             } else {
                 results.textContent = `${filteredProducts.length} produit(s) au total`;
             }
@@ -474,7 +472,7 @@
 
             // Vérifier que c'est une image
             if (!file.type.startsWith('image/')) {
-                alert('Veuillez sélectionner un fichier image valide (JPG, PNG, GIF)');
+                alert('Veuillez selectionner un fichier image valide (JPG, PNG, GIF)');
                 event.target.value = '';
                 return;
             }
@@ -572,7 +570,7 @@
                 
                 closeProductModal();
                 await loadProducts();
-                alert(id ? 'Produit modifié avec succès!' : 'Produit ajouté avec succès!');
+                alert(id ? 'Produit modifie avec succes!' : 'Produit ajoute avec succes!');
             } catch (error) {
                 alert('Erreur: ' + error.message);
             }
@@ -586,7 +584,7 @@
         }
 
         async function deleteProduct(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+            if (confirm('Etes-vous sur de vouloir supprimer ce produit ?')) {
                 try {
                     const { error } = await supabase
                         .from('products')
@@ -596,7 +594,7 @@
                     if (error) throw error;
                     
                     await loadProducts();
-                    alert('Produit supprimé avec succès!');
+                    alert('Produit supprime avec succes!');
                 } catch (error) {
                     alert('Erreur lors de la suppression: ' + error.message);
                 }
@@ -605,9 +603,10 @@
 
         function downloadTemplate() {
             const template = [
-                ['Nom', 'Fabricant', 'Saveurs', 'Image_URL', 'Description'],
-                ['Fruit Mix Premium', 'VapeMax', 'fraise,mangue,kiwi', 'https://example.com/image.jpg', 'Mélange fruité'],
-                ['Menthol Ice', 'CoolVape', 'menthe,eucalyptus', '', 'Fraîcheur intense']
+                ['Nom', 'Fabricant', 'Saveurs', 'Image', 'Description'],
+                ['Fruit Mix Premium', 'VapeMax', 'fraise,mangue,kiwi', 'https://example.com/image.jpg', 'Melange fruité'],
+                ['Menthol Ice', 'CoolVape', 'menthe,eucalyptus', '', 'Fraicheur intense'],
+                ['Vanilla Cream', 'SweetCloud', 'vanille,creme', '', 'Douceur onctueuse']
             ];
             
             const csv = template.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
@@ -630,7 +629,7 @@
                 
                 if (fileName.endsWith('.csv')) {
                     const text = await file.text();
-                    console.log('Contenu brut CSV (100 premiers caractères):', text.substring(0, 100));
+                    console.log('Contenu brut CSV (100 premiers caracteres):', text.substring(0, 100));
                     data = parseCSVAdvanced(text);
                 } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
                     const arrayBuffer = await file.arrayBuffer();
@@ -650,7 +649,7 @@
                     }
                 }
                 
-                console.log('Données parsées:', data.slice(0, 2)); // Afficher les 2 premières lignes
+                console.log('Donnees parsees:', data.slice(0, 2)); // Afficher les 2 premières lignes
                 
                 importData = processImportData(data);
                 showImportPreview();
@@ -663,7 +662,7 @@
         }
 
         function parseCSVAdvanced(text) {
-            console.log('=== DÉBUT ANALYSE CSV ===');
+            console.log('=== DEBUT ANALYSE CSV ===');
             
             // Nettoyer le texte
             text = text.trim();
@@ -676,7 +675,7 @@
             }
             
             const firstLine = lines[0];
-            console.log('Première ligne brute:', firstLine);
+            console.log('Premiere ligne brute:', firstLine);
             
             // Détecter le séparateur
             const separators = [',', ';', '\t', '|'];
@@ -687,7 +686,7 @@
                 // Compter en ignorant les séparateurs dans les guillemets
                 const testSplit = splitCSVLine(firstLine, sep);
                 const columns = testSplit.length;
-                console.log(`Test séparateur "${sep}": ${columns} colonnes`, testSplit);
+                console.log(`Test separateur "${sep}": ${columns} colonnes`, testSplit);
                 
                 if (columns > maxColumns && columns >= 3) { // Au moins 3 colonnes nécessaires
                     maxColumns = columns;
@@ -695,11 +694,11 @@
                 }
             });
             
-            console.log(`Séparateur choisi: "${bestSeparator}" (${maxColumns} colonnes)`);
+            console.log(`Separateur choisi: "${bestSeparator}" (${maxColumns} colonnes)`);
             
             // Parser toutes les lignes
             const headers = splitCSVLine(firstLine, bestSeparator).map(h => h.trim());
-            console.log('Headers détectés:', headers);
+            console.log('Headers detectes:', headers);
             
             const result = lines.slice(1).map((line, index) => {
                 const values = splitCSVLine(line, bestSeparator);
@@ -763,70 +762,6 @@
             });
         }
 
-        function parseCSV(text) {
-            const lines = text.split('\n').filter(line => line.trim());
-            if (lines.length <= 1) return [];
-            
-            // Détecter le séparateur automatiquement
-            const separators = [',', ';', '\t', '|'];
-            let bestSeparator = ',';
-            let maxColumns = 0;
-            
-            const firstLine = lines[0];
-            separators.forEach(sep => {
-                const columns = firstLine.split(sep).length;
-                if (columns > maxColumns) {
-                    maxColumns = columns;
-                    bestSeparator = sep;
-                }
-            });
-            
-            console.log(`Séparateur détecté: "${bestSeparator}" (${maxColumns} colonnes)`);
-            
-            // Parser avec le bon séparateur
-            const headers = parseCSVLine(lines[0], bestSeparator);
-            return lines.slice(1).map(line => {
-                const values = parseCSVLine(line, bestSeparator);
-                const obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = values[index] || '';
-                });
-                return obj;
-            });
-        }
-        
-        function parseCSVLine(line, separator) {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                const nextChar = line[i + 1];
-                
-                if (char === '"') {
-                    if (inQuotes && nextChar === '"') {
-                        // Double quote = escaped quote
-                        current += '"';
-                        i++; // Skip next quote
-                    } else {
-                        // Toggle quote state
-                        inQuotes = !inQuotes;
-                    }
-                } else if (char === separator && !inQuotes) {
-                    // End of field
-                    result.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            
-            // Add last field
-            result.push(current.trim());
-            return result;
-        }
-
         function processImportData(data) {
             return data.map(row => {
                 const name = findField(row, ['nom', 'name', 'produit']);
@@ -880,7 +815,7 @@
                 
                 ${validProducts.length > 0 ? `
                     <div class="mb-6">
-                        <h4 class="font-semibold text-green-800 mb-3">✅ Produits à importer (${validProducts.length})</h4>
+                        <h4 class="font-semibold text-green-800 mb-3">Produits a importer (${validProducts.length})</h4>
                         <div class="border rounded-lg overflow-hidden max-h-60 overflow-y-auto">
                             <table class="w-full text-sm">
                                 <thead class="bg-gray-50">
@@ -932,7 +867,7 @@
                 
                 closeImportModal();
                 await loadProducts();
-                alert(`${validProducts.length} produit(s) importé(s) avec succès!`);
+                alert(`${validProducts.length} produit(s) importe(s) avec succes!`);
             } catch (error) {
                 alert('Erreur lors de l\'import: ' + error.message);
             }
