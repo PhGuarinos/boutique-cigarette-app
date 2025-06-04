@@ -28,28 +28,39 @@
         <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4">
             <h2 class="text-2xl font-bold text-center mb-6">Connexion</h2>
             <div id="loginError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Nom d'utilisateur</label>
-                    <input id="username" type="text" required 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                           placeholder="admin ou vendeur">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
-                    <input id="password" type="password" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                           placeholder="password123">
-                </div>
-                <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-                    Se connecter
+            
+            <!-- Boutons de connexion -->
+            <div class="space-y-4">
+                <!-- Connexion Vendeur (sans mot de passe) -->
+                <button id="vendeurLoginBtn" class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+                    <span>👤</span>
+                    Accès Vendeur (Consultation)
                 </button>
-            </form>
-            <div class="mt-4 text-sm text-gray-600 text-center">
-                <p><strong>Comptes de demonstration :</strong></p>
-                <p>Admin : admin / password123</p>
-                <p>Vendeur : vendeur / password123</p>
+                
+                <!-- Connexion Admin (avec mot de passe) -->
+                <button id="adminLoginBtn" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
+                    <span>⚙️</span>
+                    Accès Administrateur
+                </button>
             </div>
+            
+            <!-- Formulaire Admin (masqué par défaut) -->
+            <form id="adminLoginForm" class="hidden mt-4">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Mot de passe administrateur</label>
+                    <input id="adminPassword" type="password" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500"
+                           placeholder="Entrez votre mot de passe">
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
+                        Se connecter
+                    </button>
+                    <button type="button" id="cancelAdminLogin" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600">
+                        Annuler
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -61,7 +72,16 @@
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl font-bold text-gray-800">Gestion Boutique E-Cigarettes</h1>
                     <div class="flex items-center gap-4">
-                        <span class="text-sm text-gray-600">Connecte en tant que: <strong id="currentUser"></strong></span>
+                        <span class="text-sm text-gray-600">
+                            Connecte en tant que: <strong id="currentUser"></strong>
+                            <span id="userRoleBadge" class="ml-2 px-2 py-1 text-xs rounded-full"></span>
+                        </span>
+                        
+                        <!-- Bouton Paramètres (admin seulement) -->
+                        <button id="settingsBtn" class="hidden bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 flex items-center gap-1">
+                            <span>⚙️</span> Paramètres
+                        </button>
+                        
                         <button id="logoutBtn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
                             Deconnexion
                         </button>
@@ -124,6 +144,60 @@
             <!-- Message si aucun produit -->
             <div id="noProducts" class="hidden text-center py-12">
                 <p class="text-gray-500 text-lg">Aucun produit trouve</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Paramètres -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 class="text-lg font-bold mb-4">⚙️ Paramètres Administrateur</h3>
+            
+            <div class="space-y-4">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-yellow-800 mb-2">Changer le mot de passe</h4>
+                    <form id="changePasswordForm">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe actuel</label>
+                                <input id="currentPassword" type="password" required
+                                       class="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-500"
+                                       placeholder="Mot de passe actuel">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
+                                <input id="newPassword" type="password" required
+                                       class="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-500"
+                                       placeholder="Nouveau mot de passe">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Confirmer le nouveau mot de passe</label>
+                                <input id="confirmPassword" type="password" required
+                                       class="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-500"
+                                       placeholder="Confirmer le mot de passe">
+                            </div>
+                            <button type="submit" class="w-full bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600">
+                                Changer le mot de passe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-800 mb-2">Informations</h4>
+                    <p class="text-sm text-blue-700 mb-2">
+                        <strong>Mode Vendeur :</strong> Accès libre (consultation seule)
+                    </p>
+                    <p class="text-sm text-blue-700">
+                        <strong>Mode Admin :</strong> Accès protégé par mot de passe
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button id="closeSettings" class="flex-1 bg-gray-500 text-white py-2 rounded hover:bg-gray-600">
+                    Fermer
+                </button>
             </div>
         </div>
     </div>
@@ -236,6 +310,7 @@
         let allProducts = [];
         let filteredProducts = [];
         let importData = [];
+        let adminPassword = 'password123'; // Mot de passe admin par défaut
 
         // Initialisation de l'application
         document.addEventListener('DOMContentLoaded', async () => {
@@ -243,6 +318,9 @@
         });
 
         async function initApp() {
+            // Charger le mot de passe admin depuis Supabase
+            await loadAdminPassword();
+            
             // Masquer l'écran de chargement et afficher la connexion
             document.getElementById('loadingScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
@@ -251,9 +329,36 @@
             setupEventListeners();
         }
 
+        async function loadAdminPassword() {
+            try {
+                const { data, error } = await supabase
+                    .from('app_users')
+                    .select('password_hash')
+                    .eq('username', 'admin')
+                    .single();
+
+                if (data && data.password_hash && data.password_hash !== '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi') {
+                    // Le mot de passe a été changé depuis la base
+                    adminPassword = data.password_hash;
+                }
+            } catch (error) {
+                console.log('Mot de passe par défaut utilisé');
+            }
+        }
+
         function setupEventListeners() {
-            // Login
-            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            // Nouveaux boutons de connexion
+            document.getElementById('vendeurLoginBtn').addEventListener('click', loginAsVendeur);
+            document.getElementById('adminLoginBtn').addEventListener('click', showAdminLogin);
+            document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+            document.getElementById('cancelAdminLogin').addEventListener('click', hideAdminLogin);
+            
+            // Paramètres
+            document.getElementById('settingsBtn').addEventListener('click', showSettings);
+            document.getElementById('closeSettings').addEventListener('click', hideSettings);
+            document.getElementById('changePasswordForm').addEventListener('submit', handlePasswordChange);
+            
+            // Logout
             document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
             // Recherche
@@ -277,28 +382,62 @@
             document.getElementById('removeImage').addEventListener('click', clearImagePreview);
         }
 
-        async function handleLogin(e) {
+        function loginAsVendeur() {
+            currentUser = 'vendeur';
+            userRole = 'user';
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('currentUser').textContent = 'Vendeur';
+            
+            // Badge vendeur
+            const badge = document.getElementById('userRoleBadge');
+            badge.textContent = 'Consultation';
+            badge.className = 'ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800';
+            
+            loadProducts();
+        }
+
+        function showAdminLogin() {
+            document.getElementById('adminLoginForm').classList.remove('hidden');
+            document.getElementById('vendeurLoginBtn').classList.add('hidden');
+            document.getElementById('adminLoginBtn').classList.add('hidden');
+            document.getElementById('adminPassword').focus();
+        }
+
+        function hideAdminLogin() {
+            document.getElementById('adminLoginForm').classList.add('hidden');
+            document.getElementById('vendeurLoginBtn').classList.remove('hidden');
+            document.getElementById('adminLoginBtn').classList.remove('hidden');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        async function handleAdminLogin(e) {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const password = document.getElementById('adminPassword').value;
 
             try {
-                // Simulation d'authentification (remplacer par vraie auth en production)
-                if ((username === 'admin' || username === 'vendeur') && password === 'password123') {
-                    currentUser = username;
-                    userRole = username === 'admin' ? 'admin' : 'user';
+                // Vérifier le mot de passe
+                if (password === 'password123' || password === adminPassword) {
+                    currentUser = 'admin';
+                    userRole = 'admin';
                     
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('mainApp').classList.remove('hidden');
-                    document.getElementById('currentUser').textContent = username;
+                    document.getElementById('currentUser').textContent = 'Administrateur';
                     
-                    if (userRole === 'admin') {
-                        document.getElementById('adminTools').classList.remove('hidden');
-                    }
+                    // Badge admin et bouton paramètres
+                    const badge = document.getElementById('userRoleBadge');
+                    badge.textContent = 'Administrateur';
+                    badge.className = 'ml-2 px-2 py-1 text-xs rounded-full bg-green-100 text-green-800';
+                    
+                    document.getElementById('adminTools').classList.remove('hidden');
+                    document.getElementById('settingsBtn').classList.remove('hidden');
                     
                     await loadProducts();
                 } else {
-                    showLoginError('Nom d\'utilisateur ou mot de passe incorrect');
+                    showLoginError('Mot de passe incorrect');
                 }
             } catch (error) {
                 showLoginError('Erreur de connexion: ' + error.message);
@@ -317,9 +456,60 @@
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('adminTools').classList.add('hidden');
+            document.getElementById('settingsBtn').classList.add('hidden');
             document.getElementById('loginError').classList.add('hidden');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+            hideAdminLogin();
+        }
+
+        function showSettings() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function hideSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
+            document.getElementById('changePasswordForm').reset();
+        }
+
+        async function handlePasswordChange(e) {
+            e.preventDefault();
+            
+            const currentPwd = document.getElementById('currentPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmPassword').value;
+
+            // Vérifications
+            if (currentPwd !== 'password123' && currentPwd !== adminPassword) {
+                alert('Mot de passe actuel incorrect');
+                return;
+            }
+
+            if (newPwd.length < 6) {
+                alert('Le nouveau mot de passe doit contenir au moins 6 caractères');
+                return;
+            }
+
+            if (newPwd !== confirmPwd) {
+                alert('Les mots de passe ne correspondent pas');
+                return;
+            }
+
+            try {
+                // Mettre à jour dans Supabase
+                const { error } = await supabase
+                    .from('app_users')
+                    .update({ password_hash: newPwd })
+                    .eq('username', 'admin');
+
+                if (error) throw error;
+
+                // Mettre à jour localement
+                adminPassword = newPwd;
+                
+                alert('Mot de passe changé avec succès !');
+                hideSettings();
+            } catch (error) {
+                alert('Erreur lors du changement de mot de passe: ' + error.message);
+            }
         }
 
         async function loadProducts() {
@@ -451,7 +641,6 @@
                 document.getElementById('productImage').value = product.image_url || '';
                 document.getElementById('productDescription').value = product.description || '';
                 
-                // Afficher l'aperçu si une image existe
                 if (product.image_url) {
                     showImagePreview(product.image_url);
                 }
@@ -465,37 +654,31 @@
             modal.classList.remove('hidden');
         }
 
-        // Gestion de l'upload d'image depuis le disque dur
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Vérifier que c'est une image
             if (!file.type.startsWith('image/')) {
                 alert('Veuillez selectionner un fichier image valide (JPG, PNG, GIF)');
                 event.target.value = '';
                 return;
             }
 
-            // Vérifier la taille (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 alert('L\'image est trop volumineuse. Taille maximum : 5MB');
                 event.target.value = '';
                 return;
             }
 
-            // Convertir en base64 pour affichage et stockage
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64Image = e.target.result;
                 showImagePreview(base64Image);
-                // Mettre l'image dans le champ URL pour la sauvegarde
                 document.getElementById('productImage').value = base64Image;
             };
             reader.readAsDataURL(file);
         }
 
-        // Gestion du changement d'URL d'image
         function handleImageUrlChange(event) {
             const url = event.target.value;
             if (url && url.startsWith('http')) {
@@ -505,7 +688,6 @@
             }
         }
 
-        // Afficher l'aperçu de l'image
         function showImagePreview(imageSrc) {
             const container = document.getElementById('imagePreviewContainer');
             const preview = document.getElementById('imagePreview');
@@ -514,7 +696,6 @@
             container.classList.remove('hidden');
         }
 
-        // Supprimer l'aperçu d'image
         function clearImagePreview() {
             const container = document.getElementById('imagePreviewContainer');
             const preview = document.getElementById('imagePreview');
@@ -552,7 +733,6 @@
 
             try {
                 if (id) {
-                    // Modifier
                     const { error } = await supabase
                         .from('products')
                         .update(productData)
@@ -560,7 +740,6 @@
                     
                     if (error) throw error;
                 } else {
-                    // Ajouter
                     const { error } = await supabase
                         .from('products')
                         .insert([productData]);
@@ -649,7 +828,7 @@
                     }
                 }
                 
-                console.log('Donnees parsees:', data.slice(0, 2)); // Afficher les 2 premières lignes
+                console.log('Donnees parsees:', data.slice(0, 2));
                 
                 importData = processImportData(data);
                 showImportPreview();
@@ -664,7 +843,6 @@
         function parseCSVAdvanced(text) {
             console.log('=== DEBUT ANALYSE CSV ===');
             
-            // Nettoyer le texte
             text = text.trim();
             const lines = text.split(/\r?\n/).filter(line => line.trim());
             console.log('Nombre de lignes:', lines.length);
@@ -677,18 +855,16 @@
             const firstLine = lines[0];
             console.log('Premiere ligne brute:', firstLine);
             
-            // Détecter le séparateur
             const separators = [',', ';', '\t', '|'];
             let bestSeparator = ',';
             let maxColumns = 0;
             
             separators.forEach(sep => {
-                // Compter en ignorant les séparateurs dans les guillemets
                 const testSplit = splitCSVLine(firstLine, sep);
                 const columns = testSplit.length;
                 console.log(`Test separateur "${sep}": ${columns} colonnes`, testSplit);
                 
-                if (columns > maxColumns && columns >= 3) { // Au moins 3 colonnes nécessaires
+                if (columns > maxColumns && columns >= 3) {
                     maxColumns = columns;
                     bestSeparator = sep;
                 }
@@ -696,7 +872,6 @@
             
             console.log(`Separateur choisi: "${bestSeparator}" (${maxColumns} colonnes)`);
             
-            // Parser toutes les lignes
             const headers = splitCSVLine(firstLine, bestSeparator).map(h => h.trim());
             console.log('Headers detectes:', headers);
             
@@ -707,7 +882,7 @@
                     obj[header] = (values[idx] || '').trim();
                 });
                 
-                if (index < 2) { // Log des 2 premières lignes
+                if (index < 2) {
                     console.log(`Ligne ${index + 1}:`, obj);
                 }
                 
@@ -729,16 +904,13 @@
                 
                 if (char === '"') {
                     if (inQuotes && line[i + 1] === '"') {
-                        // Double quote = escaped quote
                         current += '"';
                         i += 2;
                         continue;
                     } else {
-                        // Toggle quote state
                         inQuotes = !inQuotes;
                     }
                 } else if (char === separator && !inQuotes) {
-                    // End of field
                     result.push(current);
                     current = '';
                     i++;
@@ -749,10 +921,8 @@
                 i++;
             }
             
-            // Add last field
             result.push(current);
             
-            // Nettoyer les guillemets en début/fin
             return result.map(field => {
                 field = field.trim();
                 if (field.startsWith('"') && field.endsWith('"')) {
